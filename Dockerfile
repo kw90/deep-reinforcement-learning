@@ -8,11 +8,14 @@ ENV LC_ALL C.UTF-8
 
 RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -yq dist-upgrade \
  && apt-get -o Acquire::ForceIPv4=true install -yq --no-install-recommends \
-	locales cmake git build-essential \
-    python-pip \
+	locales cmake git build-essential software-properties-common python3.7 \
+        python-pip \
 	python3-pip python3-setuptools \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+
+# Add python 3.6 & python 3.7 to update-alternatives
+RUN rm /usr/bin/python3 && ln -s python3.7 /usr/bin/python3
 
 RUN pip3 install --upgrade pip setuptools \
  && python3 -m pip install jupyterlab==0.35.4 bash_kernel==0.7.1 tornado==5.1.1 \
