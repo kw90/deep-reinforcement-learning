@@ -81,12 +81,17 @@ RUN apt-get -o Acquire::ForceIPv4=true update \
     build-essential \
     curl \
     xvfb \
+    xserver-xephyr \
+    x11-utils \
     ffmpeg \
     xorg-dev \
     libsdl2-dev \
     swig \
     cmake \
     python-opengl \
+    fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
+    libnspr4 libnss3 lsb-release xdg-utils libxss1 libdbus-glib-1-2 \
+    curl unzip wget \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -100,7 +105,8 @@ RUN pip3 install  \
     torchvision \
     matplotlib \
     seaborn \
-    pandas
+    pandas \
+    pyvirtualdisplay
 
 ##################################### COPY #####################################
 
@@ -124,7 +130,7 @@ RUN pip install .
 ##################################### TAIL #####################################
 
 RUN chown ${NB_UID} ${HOME}/RLOpenAIGymGPU
- 
+
 USER ${NB_USER}
 
 WORKDIR ${HOME}/RLOpenAIGymGPU
