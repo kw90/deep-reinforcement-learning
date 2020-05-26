@@ -80,13 +80,34 @@ class Agent():
 
         Params
         ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
+            experiences (Tuple[torch.Variable]): tuple of (s, a, r, s', done) tuples 
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
 
-        ## TODO: compute and minimize the loss
-        "*** YOUR CODE HERE ***"
+        # Compute and minimize the loss
+        criterion = torch.nn.MSELoss()
+        
+        ## Move input and label tensors to correct device
+        self.qnetwork_local.to(device)
+        self.qnetwork_target.to(device)
+        inputs = next_states.to(device)
+        
+        ## Select max predicted Q value for next state using the target model
+        with torch.no_grad():
+            next_target = self.qnetwork_target(inputs)
+            next_q_target = next_target.max(1)[0].unsqueeze(1)
+        ## Calculate q targets
+        target_q = rewards + (gamma * next_q_target * (1 - dones))
+        
+        ## Use local model to get the expected Q value
+        expected_q = self.qnetwork_local(states).gather(1, actions)
+        
+        ## Compute and minimize the loss
+        loss = criterion(expected_q, target_q)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
         # ------------------- update target network ------------------- #
         self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)                     
